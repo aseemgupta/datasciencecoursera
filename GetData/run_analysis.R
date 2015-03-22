@@ -1,5 +1,7 @@
 run_analysis <- function() {
 
+#load data
+
 	X_train <- read.table("data/train/X_train.txt")
 
 	Y_train <- read.table("data/train/y_train.txt")
@@ -12,25 +14,27 @@ run_analysis <- function() {
 
 	Subject_test <- read.table("data/test/subject_test.txt")
 
+#load variable name and Activity Name	
 	X_names<- read.table("data/features.txt")
 
 	Y_names<- read.table("data/activity_labels.txt")
 
+#Merge Training and Test data	
 	Subject<-rbind(Subject_test,Subject_train)
 
 	X<-rbind(X_test,X_train)
 
 	Y<-rbind(Y_test,Y_train)
 
+# update Col name of subjest and activity	
 	names(Subject)<-"Subject"
 	names(Y)<-"Activity"
 
-
+#Merge Subject, Activity and X data
 	Complete_data<-cbind(Subject,Y,Y,X)
 
-	Complete_data<-Complete_data[order(Complete_data$Subject,Complete_data$Activity),]
-
-
+	
+#Create vector of col number containing mean and standard deviation
 	X_names_mean<-X_names[grep("mean",X_names$V2),]
 
 	X_names_std<-X_names[grep("std",X_names$V2),]
@@ -38,9 +42,12 @@ run_analysis <- function() {
 	X_names_sorted<-rbind(X_names_mean,X_names_std)
 
 	X_names_sorted<-X_names_sorted[order(X_names_sorted$V1),]
+	
+#Subset data based on Sorted col number for	containing mean and standard deviation data
 
 	Complete_data_sorted<-Complete_data[,c(1,2,3,X_names_sorted$V1+3)]
 
+# Assign activity name	
 	Complete_data_sorted$Activity.1 <- as.character(Complete_data_sorted$Activity.1)
 
 	Y_names$V1 <- as.character(Y_names$V1)
@@ -52,7 +59,7 @@ run_analysis <- function() {
 
 	}
 
-
+# Assign Col name
 	df_temp<-data.frame()
 	df_temp[1,1]<-1
 	df_temp[1,2]<-"Subject"
@@ -69,6 +76,7 @@ run_analysis <- function() {
 	names(Complete_data_sorted)<-Cname
 	tidy_data_set<-data.frame()
 
+# New tidy data set with the average of each variable for each activity and each subject.	
 	for(i in 1:30) {
 		for (j in 1:6) {
 			tidy_mean<-data.frame()
